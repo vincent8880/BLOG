@@ -26,7 +26,9 @@
         {% endfor %}
     </div>
 </div>
+<br/>
 <div class="header">
+<div class="container-fluid">
     <div class="intro">
         <h1 class="display-4">Hey There {{current_user.username}}!..</h1>
         {% if current_user.is_admin %}
@@ -45,5 +47,6 @@
         </div>
         {% endif %}
     </div>
+</div>
 </div>
 {% endblock %}
