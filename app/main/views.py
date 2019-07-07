@@ -1,156 +1,103 @@
-from flask import render_template, request, redirect, url_for, flash, abort
-from . import main
-from ..models import User, Pitch, Comment, UpVote, DownVote
+from flask import render_template, redirect, url_for, flash
 from flask_login import login_required, current_user
-from .. import db, photos
-from .forms import PitchForm, CommentForm, UpdateProfile
+from flask_admin.contrib.sqla import ModelView
+from . forms import PostForm, CommentForm, SubscribersForm
+from .import main
+from .. import db, basic_auth
 import markdown2
+from .email import mail_message
+from ..models import User, Post, Role, Comment, Subscribers
+from datetime import datetime
 
-@main.route('/')
+@main.route('/',methods=['GET', 'POST'])
 def index():
-    '''
-    root page function that returns the index page and its data
-    '''
-    title = "Welcome | One Minute Pitch"
-
-    return render_template("index.html", title=title)
-
-@main.route('/user/<uname>&<id_user>')
-@login_required
-def profile(uname, id_user):
-    user = User.query.filter_by(username = uname).first()
-
-    title = f"{uname.capitalize()}'s Profile"
-
-    get_pitches = Pitch.query.filter_by(user_id = id_user).all()
-    get_comments = Comment.query.filter_by(user_id = id_user).all()
-    get_upvotes = UpVote.query.filter_by(id_user = id_user).all()
-    get_downvotes = DownVote.query.filter_by(id_user = id_user).all()
-
-    if user is None:
-        abort(404)
+    title= "Blog On | Home "
+    all = Post.query.order_by('id').all()
+    print(f'blogs {all}')
+  
+    subscribers = SubscribersForm()
+    try:
+        if subscribers.validate_on_submit():
+            subscriber = Subscribers(email = subscribers.email.data)
+            db.session.add(subscriber)
+            db.session.commit()
+            flash('You are now subscribed!')
+            mail_message("Welcome to Blog On","email/welcome",subscriber.email,subscriber=subscriber)
+            print("sent")
+            return redirect(url_for('main.index'))
+    except:
+        return redirect(url_for('main.index'))
+        
+        
+    return render_template('index.html', title = title, posts=all, subscribers=subscribers)
     
-    return render_template('profile/profile.html', user = user, title=title, pitches_no = get_pitches, comments_no = get_comments, likes_no = get_upvotes, dislikes_no = get_downvotes)
 
-@main.route('/home/like/<int:id>', methods = ['GET','POST'])
+
+@main.route('/profile/<username>')
 @login_required
-def like(id):
-    get_pitches = UpVote.get_votes(id)
-    valid_string = f'{current_user.id}:{id}'
 
-    for get_pitch in get_pitches:
-        to_str = f'{get_pitch}'
-        print(valid_string+" "+to_str)
-        if valid_string == to_str:
-            return redirect(url_for('main.pitch',id=id))
-        else:
-            continue
-
-    like_pitch = UpVote(user = current_user, pitching_id=id)
-    like_pitch.save_vote()
-
-    return redirect(url_for('main.pitch',id=id))
-
-@main.route('/home/dislike/<int:id>', methods = ['GET','POST'])
-@login_required
-def dislike(id):
-    get_pitches = DownVote.get_downvotes(id)
-    valid_string = f'{current_user.id}:{id}'
-
-    for get_pitch in get_pitches:
-        to_str = f'{get_pitch}'
-        print(valid_string+" "+to_str)
-        if valid_string == to_str:
-            return redirect(url_for('main.pitch',id=id))
-        else:
-            continue
-
-    dislike_pitch = DownVote(user = current_user, pitching_id=id)
-    dislike_pitch.save_vote()
-
-    return redirect(url_for('main.pitch',id=id))
-
-@main.route('/home', methods = ['GET', 'POST'])
-@login_required
-def home():
-    pitch_form = PitchForm()
+def profile(username):
     
-    if pitch_form.validate_on_submit():
-        pitch = pitch_form.pitch.data
-        cat = pitch_form.my_category.data
+    user = User.query.filter_by(username = username).first_or_404()
+    title = "Profile"       
+    return render_template('profile.html' , user=user,title=title)
 
-        new_pitch = Pitch(pitch_content=pitch, pitch_category = cat, user = current_user)
-        new_pitch.save_pitch()
+@main.route('/post', methods=['GET', 'POST'])
+def post():
+    all = Post.query.all()
+    all.reverse()
+    print(all)
 
-        return redirect(url_for('main.home'))
-
-    all_pitches = Pitch.get_all_pitches()
-
-    title = 'Home | One Minute Pitch'    
-    return render_template('home.html', title = title, pitch_form = pitch_form, pitches = all_pitches)
-
-@main.route('/pitch/<int:id>',methods = ['GET','POST'])
-@login_required
-def pitch(id):
-    
-    my_pitch = Pitch.query.get(id)
-    comment_form = CommentForm()
-
-    if id is None:
-        abort(404)
-
-    if comment_form.validate_on_submit():
-        comment_data = comment_form.comment.data
-        new_comment = Comment(comment_content = comment_data, pitch_id = id, user = current_user)
-        new_comment.save_comment()
-
-        return redirect(url_for('main.pitch',id=id))
-
-    all_comments = Comment.get_comments(id)
-    # print(all_comments)
-    # format_comments = markdown2.markdown(all_comments.comment_content,extras=["code-friendly", "fenced-code-blocks"])
-
-    up_likes = UpVote.get_votes(id)
-    down_likes = DownVote.get_downvotes(id)
-
-    title = 'Comment | One Minute Pitch'
-    return render_template('pitch.html',pitch = my_pitch, comment_form = comment_form, comments = all_comments, title = title, likes = up_likes, dislikes=down_likes)
-
-@main.route('/category/<cat>')
-def category(cat):
-    my_category = Pitch.get_category(cat)
-
-    title = f'{cat} category | One Minute Pitch'
-
-    return render_template('category.html', title=title, category=my_category)
-
-@main.route('/user/<uname>/update', methods=['GET','POST'])
-@login_required
-def update_profile(uname):
-    user = User.query.filter_by(username = uname).first()
-
-    if user is None:
-        abort(404)
-    
-    update_form = UpdateProfile()
-
-    if update_form.validate_on_submit():
-        user.bio = update_form.bio.data
-        db.session.add(user)
+    Comments = CommentForm()
+    if Comments.validate_on_submit():
+        comment = Comment(comment = Comments.comment.data, commenter = Comments.commenter.data)
+        db.session.add(comment)
         db.session.commit()
+        print(comment)
+        return redirect(url_for('main.post'))
 
-        return redirect(url_for('.profile',uname = user.username,id_user=user.id))
-    title = 'Update Bio'
-    return render_template('profile/update.html', form=update_form, title = title)
-
-@main.route('/user/<uname>/update/pic',methods= ['POST'])
-@login_required
-def update_pic(uname):
-    user = User.query.filter_by(username = uname).first()
-    if 'photo' in request.files:
-        filename = photos.save(request.files['photo'])
-        path = f'photos/{filename}'
-        user.profile_pic_path = path
-        # user_photo = PhotoProfile(pic_path = path,user = user)
+    allcomments = Comment.query.all()
+    title = "Post Article"
+    Blog = PostForm()
+    # try:
+    if Blog.validate_on_submit():
+        post = Post( title = Blog.title.data ,post = Blog.Entry.data, user_id = current_user.id, timeposted = datetime.utcnow() )
+        db.session.add(post)
         db.session.commit()
-    return redirect(url_for('main.profile',uname=uname,id_user=current_user.id))
+        return redirect(url_for('main.post'))
+    # except:
+    #     flash("Sorry you can NOT post more than 225 characters for now. We are aware of this situation and are currently working on this.")
+    #     return redirect(url_for('main.post'))
+
+    return render_template('post.html', Post = Blog, title = title, posts = all, comment = Comments, allcomments = allcomments)
+
+
+
+@main.route('/post/<id>', methods=['POST','GET'])
+def fullpost(id):
+    
+    title= f'Posts' 
+    post = Post.query.filter_by(id=id).first()
+    Comments = CommentForm()
+    if Comments.validate_on_submit():
+        comment = Comment(comment = Comments.comment.data, post_id=id, commenter = Comments.commenter.data)
+        db.session.add(comment)
+        db.session.commit()
+        print(comment)
+        return redirect(url_for('main.fullpost', id=post.id))
+    allcomments = Comment.query.all()
+    postcomments = Comment.query.filter_by(post_id=id).all()
+     
+
+    return render_template('fullpost.html', title = title, post = post, comment = Comments, allcomments = allcomments, postcomments = postcomments)
+
+            
+
+@main.route('/<int:id>/delete', methods=['POST'])
+@login_required
+def delete(id):
+    get_post(id)
+    db = get_db()
+    db.execute('DELETE FROM post WHERE id = ?, (id,)')
+    db.commit()
+    return redirect(url_for('main.index'))
