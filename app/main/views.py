@@ -12,7 +12,7 @@ from datetime import datetime
 @main.route('/',methods=['GET', 'POST'])
 def index():
     title= "Blog On | Home "
-    all = Post.query.order_by('-id').all()
+    all = Post.query.order_by('id').all()
     print(f'blogs {all}')
   
     subscribers = SubscribersForm()

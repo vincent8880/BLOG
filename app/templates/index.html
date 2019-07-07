@@ -2,26 +2,7 @@
 {% import 'bootstrap/wtf.html' as wtf %}
 
 {% block content %}
-<div class="header">
-    <div class="intro">
-        <h1 class="display-4">Hey There {{current_user.username}}!..</h1>
-        {% if current_user.is_admin %}
-        <p>Welcome to Blog On!... You can now start posting your articles here!...</p> 
-        <button><a href="{{url_for('main.post')}}">Post article</a> </button> 
-        {% else %}
-        <p>Welcome! You can now Read and share articles!..</p>
-        <div class="subscribers">
-        {{wtf.quick_form(subscribers)}}
-        {% for message in get_flashed_messages() %}
-            <div class="alert alert-danger">
-            <button type="button" class="close" data-dismiss="alert">&times;</button>
-            {{ message }}
-            </div>
-        {% endfor %}
-        </div>
-        {% endif %}
-    </div>
-</div>
+
 
 <div class="container-fluid">
     <div class="row posts">
@@ -43,6 +24,26 @@
             </div> 
         </div>
         {% endfor %}
+    </div>
+</div>
+<div class="header">
+    <div class="intro">
+        <h1 class="display-4">Hey There {{current_user.username}}!..</h1>
+        {% if current_user.is_admin %}
+        <p>Welcome to Blog On!... You can now start posting your articles here!...</p> 
+        <button><a href="{{url_for('main.post')}}">Post article</a> </button> 
+        {% else %}
+        <p>Welcome! You can now Read and share articles!..</p>
+        <div class="subscribers">
+        {{wtf.quick_form(subscribers)}}
+        {% for message in get_flashed_messages() %}
+            <div class="alert alert-danger">
+            <button type="button" class="close" data-dismiss="alert">&times;</button>
+            {{ message }}
+            </div>
+        {% endfor %}
+        </div>
+        {% endif %}
     </div>
 </div>
 {% endblock %}
