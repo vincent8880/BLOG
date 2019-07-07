@@ -18,7 +18,7 @@
 }
 button{
     color:white;
-    background-color:#AA076B;
+    background-color:burlywood;
     border:0%;
     border-radius:99em;
 }
@@ -48,8 +48,8 @@ a{
     justify-content: center;
 }
 .navbar-light{
-    background-color: #AA076B !important;
+    background-color:burlywood !important;
 }
 #submit{
-    background-color: #AA076B;
+    background-color: burlywood;
 }
