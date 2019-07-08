@@ -17,7 +17,7 @@
 }
 button{
     color:white;
-    background-color:burlywood;
+    background-color:#804a30;
     border:0%;
     border-radius:99em;
 }
@@ -47,11 +47,8 @@ a{
     justify-content: center;
 }
 .navbar-light{
-    background-color:burlywood !important;
+    background-color: #804a30 !important;
 }
 #submit{
-    background-color: burlywood;
-}
-li{
-    margin:0 2.5%;
+    background-color: #804a30;
 }
