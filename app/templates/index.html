@@ -33,7 +33,7 @@
             <p>Welcome !</p> 
             <button><a href="{{url_for('main.post')}}">Post article</a> </button> 
             {% else %}
-            <p>Welcome! </p>
+            <p>Welcome! You can read and comment on articles!... </p>
             <div class="subscribers">
             {{wtf.quick_form(subscribers)}}
             {% for message in get_flashed_messages() %}

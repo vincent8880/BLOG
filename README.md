@@ -1,17 +1,17 @@
 # Blog
 
-> A personal Blog where users can subscribe, post and comment on articles posted.
+> A Blog where users can subscribe, post and comment on articles posted.
 
 ## Author
 
-> By **Sarah Marion**
+> By **Vincent Ododo**
 
 > -----------------------------------------------------------
 
 ## Description
 
-> This is a web application that allows various users to submit a short pitch. Users can also be able to view other pitches from different categories (Pick-up Lines, Interview Pitches, Product Pitches, Promotion Pitches), comment and vote. For a user to do any of that, they need to have registered.
-
+> This is a web application that allows writers  to post a blog and users
+to subscribe for post updates, read comments and comment on them.
 ## User Stories
 
 As a user I would like:
@@ -50,7 +50,7 @@ As a user I would like:
 ### Prerequisites
 
 > * Internet access
-> * ```git clone https://github.com/sarah-marion/Blog.git```
+> * ```git clone https://github.com/vincent8880/Blog.git```
 > * ```cd Blog```
 
 #### To install a virtual environment
@@ -89,14 +89,14 @@ As a user I would like:
 
 ## Support and Contact Details
 
-> You can reach out to me at devsarahmarion@gmail.com
-for Reviews, Advice, Collaborations and Comments
+> You can reach out to me at ododovincent54@gmail.com
+for Reviews and Comments
 
 ## Licence
 
 > MIT License
 
-> Copyright (c) 2018 **Dev Sarah Marion**
+> Copyright (c) 2019 **Vincent Ododo**
 
 > Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal

@@ -22,7 +22,7 @@ class Config:
     MAIL_USE_SSL = True
     MAIL_USERNAME = os.environ.get("MAIL_USERNAME")
     MAIL_PASSWORD = os.environ.get("MAIL_PASSWORD")
-    SENDER_EMAIL = 'devsarahmarion@gmail.com'
+    SENDER_EMAIL = 'ododovincent54@gmail.com'
 
 
     @staticmethod
@@ -33,7 +33,7 @@ class Config:
     # simple mde configurations
     SIMPLEMDE_JS_IIFE = True
     SIMPLEMDE_USE_CDN = True
-    BASIC_AUTH_USERNAME = 'Sarah'
+    BASIC_AUTH_USERNAME = 'Vincent'
     BASIC_AUTH_pASSWORD = os.environ.get("MAIL_PASSWORD")
 
 
