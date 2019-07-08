@@ -85,7 +85,7 @@ As a user I would like:
 
 ## Known Bugs
 
-> It does not have bugs.But if any problems should occur, email me at devsarahmarion@gmail.com
+> It does not have bugs.But if any problems should occur, email me at ododovincent54@gmail.com
 
 ## Support and Contact Details
 
